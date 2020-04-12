@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="theta1" default="0"/>
+    <arg name="theta2" default="0"/>
+    <arg name="theta3" default="0"/>
+
+    <node name="rotator" pkg="AJTemplateBot" type="rotator.py" args="$(arg theta1) $(arg theta2) $(arg theta3)" output="screen"/>
+</launch>
