@@ -6,6 +6,8 @@ import numpy as np
 import sys
 from math import cos, sin, pi
 import time
+import transformations as tf
+import time
 
 
 def rotator(points):
@@ -14,47 +16,56 @@ def rotator(points):
     elbow_pub = rospy.Publisher('AJBot/elbow_rotation_controller/command', Float64, queue_size=10)
     rospy.init_node('rotator', anonymous=True)
 
+    ts = time.time()
     while base_pub.get_num_connections() < 1:
-        pass
+        if time.time() - ts > 2:
+            print 'Gazebo not running.'
+            return -1
     rospy.loginfo(points[0])
     base_pub.publish(points[0])
 
     # time.sleep(1)
     
+    ts = time.time()
     while shoulder_pub.get_num_connections() < 1:
-        pass
+        if time.time() - ts > 2:
+            print 'Gazebo not running.'
+            return -1
     rospy.loginfo(points[2])
     shoulder_pub.publish(points[2])
 
     # time.sleep(1)
 
+    ts = time.time()
     while elbow_pub.get_num_connections() < 1:
-        pass
+        if time.time() - ts > 2:
+            print 'Gazebo not running.'
+            return -1
+
+
     rospy.loginfo(points[1])
     elbow_pub.publish(points[1])
 
 if __name__ == '__main__':
-
-    print(sys.argv)
     theta1, theta2, theta3 = map(lambda x: float(x), sys.argv[1:4])
 
     d1 = .5
     alpha1 = -pi/2
-    HTM01 = np.array([[cos(theta1), -sin(theta1),   0,  0],
-                     [sin(theta1),  cos(theta1),    0,  0],
+    HTM01 = np.array([[np.cos(theta1), -np.sin(theta1),   0,  0],
+                     [np.sin(theta1),  np.cos(theta1),    0,  0],
                      [0,            0,              1,  d1],
                      [0,            0,              0,  1]])
 
     d2 = .4
-    HTM12 = np.array([[cos(theta2), 0, sin(theta2), 0],
+    HTM12 = np.array([[np.cos(theta2), 0, np.sin(theta2), 0],
                      [0,            1, 0,           0],
-                     [-sin(theta2), 0, cos(theta2), d2],
+                     [-np.sin(theta2), 0, np.cos(theta2), d2],
                      [0,            0, 0,           1]])
 
     d3 = .8
-    HTM23 = np.array([[cos(theta3), 0, sin(theta3), 0],
+    HTM23 = np.array([[np.cos(theta3), 0, np.sin(theta3), 0],
                      [0,            1, 0,           0],
-                     [-sin(theta3), 0, cos(theta3), d3],
+                     [-np.sin(theta3), 0, np.cos(theta3), d3],
                      [0,            0, 0,  1]])
 
     d4 = .8
